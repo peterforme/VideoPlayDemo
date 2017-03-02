@@ -26,6 +26,7 @@ import java.io.IOException;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.netopen.hotbitmapgg.library.view.RingProgressBar;
 
 public class VideoPlayActivity extends Activity implements SurfaceHolder.Callback {
 
@@ -46,6 +47,8 @@ public class VideoPlayActivity extends Activity implements SurfaceHolder.Callbac
     SeekBar sbProgress;
     @BindView(R.id.bottom)
     RelativeLayout bottom;
+    @BindView(R.id.progress_bar_1)
+    RingProgressBar progressBar1;
     private SurfaceHolder holder;
     private MediaPlayer mediaPlayer;
     private String fileUrl = "";
@@ -73,6 +76,12 @@ public class VideoPlayActivity extends Activity implements SurfaceHolder.Callbac
         LogUtils.pwh("本地文件的路径为:" + filePath);
         handler = new Handler();
 
+        if(FileUtil.isFileExists(filePath)){
+            progressBar1.setVisibility(View.GONE);
+        }else{
+            progressBar1.setVisibility(View.VISIBLE);
+        }
+
         //如果是希望直接播放本地的视频 那么就执行ini  iniVideo就可以了
         //ini();
         //iniVideo();
@@ -90,12 +99,13 @@ public class VideoPlayActivity extends Activity implements SurfaceHolder.Callbac
                     @Override
                     protected void progress(BaseDownloadTask task, int soFarBytes, int totalBytes) {
                         LogUtils.pwh("progress:" + soFarBytes);
-
+                        progressBar1.setProgress(soFarBytes * 100 / totalBytes);
                     }
 
                     @Override
                     protected void completed(BaseDownloadTask task) {
                         try {
+                            progressBar1.setVisibility(View.GONE);
                             LogUtils.pwh("download completed");
                             handler.postDelayed(new Runnable() {
                                 @Override
@@ -126,8 +136,6 @@ public class VideoPlayActivity extends Activity implements SurfaceHolder.Callbac
                     }
                 });
         task.start();
-
-
 
 
     }
